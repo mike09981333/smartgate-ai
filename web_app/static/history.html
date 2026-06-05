@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique des Accès</title>
+    <meta name="description" content="Historique des accès autorisés et refusés dans SmartGate AI.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=pages-html-1">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <div class="app-wrapper">
+        <aside class="glass-container sidebar">
+            <div class="sidebar-brand">
+                <div class="logo-icon">
+                    <i data-lucide="shield-check"></i>
+                </div>
+                <div>
+                    <h2>SmartGate AI</h2>
+                    <p>Navigation rapide</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a class="sidebar-link" href="/">
+                    <i data-lucide="home"></i>
+                    <span>Accueil</span>
+                </a>
+                <a class="sidebar-link" href="/static/users.html">
+                    <i data-lucide="users"></i>
+                    <span>Personnes autorisées</span>
+                </a>
+                <a class="sidebar-link active" href="/static/history.html">
+                    <i data-lucide="history"></i>
+                    <span>Historique</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-note">
+                <p class="sidebar-note-title">Traçabilité</p>
+                <p class="sidebar-note-text">Consultez les derniers accès accordés et refusés en temps réel.</p>
+            </div>
+        </aside>
+
+        <div class="content-area">
+            <div class="glass-container page-panel history-page-panel">
+                <div class="page-header">
+                    <div class="panel-title-row">
+                        <i data-lucide="history" class="panel-icon"></i>
+                        <h2>Historique</h2>
+                    </div>
+                    <span class="user-count" id="history-count">0</span>
+                </div>
+
+                <div class="history-list full-history-list" id="history-list">
+                    <div class="empty-state history-empty-state">
+                        <div class="empty-icon-wrapper">
+                            <i data-lucide="file-clock" class="empty-icon"></i>
+                        </div>
+                        <p class="empty-title">Aucun passage enregistré</p>
+                        <p class="empty-hint">Les accès accordés et refusés apparaîtront ici.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js?v=pages-html-1"></script>
+</body>
+</html>

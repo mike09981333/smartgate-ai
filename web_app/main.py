@@ -1,6 +1,8 @@
 import os
 import time
 import glob
+import sqlite3
+from datetime import datetime
 import cv2
 import numpy as np
 from fastapi import FastAPI
@@ -8,6 +10,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import base64
+from dotenv import load_dotenv
 from insightface.app import FaceAnalysis
 
 try:
@@ -17,21 +20,97 @@ except ImportError:
     serial = None
     list_ports = None
 
-app = FastAPI()
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(BASE_DIR)
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 DATA_DIR = os.path.join(BASE_DIR, "data")
 PHOTOS_DIR = os.path.join(DATA_DIR, "photos")
 EMBEDDINGS_DIR = os.path.join(DATA_DIR, "embeddings")
+load_dotenv(os.path.join(PROJECT_DIR, ".env"))
+RAW_DB_PATH = os.getenv("SQLITE_DB_PATH", os.path.join("web_app", "data", "smartgate.db"))
+DB_PATH = RAW_DB_PATH if os.path.isabs(RAW_DB_PATH) else os.path.join(PROJECT_DIR, RAW_DB_PATH)
+
+app = FastAPI()
+
 ARDUINO_BAUDRATE = int(os.getenv("ARDUINO_BAUDRATE", "9600"))
 ARDUINO_PORT = os.getenv("ARDUINO_PORT")
 ARDUINO_ENABLED = os.getenv("ARDUINO_ENABLED", "1") != "0"
 ARDUINO_READY_DELAY = float(os.getenv("ARDUINO_READY_DELAY", "2"))
+ACCESS_GRANTED_STATUS = "accorde"
+ACCESS_DENIED_STATUS = "refuse"
+DAY_NAMES_FR = {
+    "Monday": "lundi",
+    "Tuesday": "mardi",
+    "Wednesday": "mercredi",
+    "Thursday": "jeudi",
+    "Friday": "vendredi",
+    "Saturday": "samedi",
+    "Sunday": "dimanche",
+}
 
 # Create data directories on startup
 os.makedirs(PHOTOS_DIR, exist_ok=True)
 os.makedirs(EMBEDDINGS_DIR, exist_ok=True)
+
+def get_db_connection():
+    connection = sqlite3.connect(DB_PATH)
+    connection.row_factory = sqlite3.Row
+    return connection
+
+def init_database():
+    with get_db_connection() as connection:
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS access_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                person_name TEXT NOT NULL,
+                status TEXT NOT NULL CHECK(status IN ('accorde', 'refuse')),
+                similarity REAL,
+                access_date TEXT NOT NULL,
+                access_time TEXT NOT NULL,
+                access_day TEXT NOT NULL,
+                access_datetime TEXT NOT NULL,
+                barrier_opened INTEGER NOT NULL DEFAULT 0,
+                note TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+            """
+        )
+        connection.commit()
+
+def log_access_attempt(person_name, status, similarity=None, barrier_opened=False, note=None):
+    now = datetime.now()
+    day_name = DAY_NAMES_FR.get(now.strftime("%A"), now.strftime("%A"))
+    with get_db_connection() as connection:
+        connection.execute(
+            """
+            INSERT INTO access_logs (
+                person_name,
+                status,
+                similarity,
+                access_date,
+                access_time,
+                access_day,
+                access_datetime,
+                barrier_opened,
+                note
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                person_name,
+                status,
+                similarity,
+                now.strftime("%Y-%m-%d"),
+                now.strftime("%H:%M:%S"),
+                day_name,
+                now.isoformat(timespec="seconds"),
+                int(barrier_opened),
+                note,
+            ),
+        )
+        connection.commit()
+
+init_database()
 
 # Mount static files
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
@@ -47,8 +126,6 @@ face_app = FaceAnalysis(providers=['CPUExecutionProvider'])
 face_app.prepare(ctx_id=0, det_size=(320, 320))
 print("Modèle prêt.")
 
-# In-memory storage for registered face (persisted to a file)
-REGISTERED_FACE_FILE = "registered_face.npy"
 arduino_connection = None
 
 def find_arduino_port():
@@ -175,6 +252,51 @@ async def get_users():
                 })
     return {"users": users}
 
+@app.get("/access-logs")
+async def get_access_logs(limit: int = 100):
+    safe_limit = max(1, min(limit, 500))
+    with get_db_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT
+                id,
+                person_name,
+                status,
+                similarity,
+                access_date,
+                access_time,
+                access_day,
+                access_datetime,
+                barrier_opened,
+                note,
+                created_at
+            FROM access_logs
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (safe_limit,),
+        ).fetchall()
+
+    logs = []
+    for row in rows:
+        logs.append(
+            {
+                "id": row["id"],
+                "person_name": row["person_name"],
+                "status": row["status"],
+                "similarity": row["similarity"],
+                "access_date": row["access_date"],
+                "access_time": row["access_time"],
+                "access_day": row["access_day"],
+                "access_datetime": row["access_datetime"],
+                "barrier_opened": bool(row["barrier_opened"]),
+                "note": row["note"],
+                "created_at": row["created_at"],
+            }
+        )
+
+    return {"logs": logs}
+
 @app.delete("/users/{name}")
 async def delete_user(name: str):
     name = name.strip()
@@ -224,12 +346,22 @@ async def verify_face(payload: VerifyPayload):
     try:
         embeddings = load_all_embeddings()
         if not embeddings:
+            log_access_attempt(
+                person_name="Inconnu",
+                status=ACCESS_DENIED_STATUS,
+                note="Tentative de verification sans personne enregistree.",
+            )
             return JSONResponse(status_code=400, content={"message": "Aucun visage n'est enregistré. Veuillez enregistrer quelqu'un d'abord."})
 
         img = process_base64_image(payload.image)
         faces = face_app.get(img)
         
         if len(faces) == 0:
+            log_access_attempt(
+                person_name="Inconnu",
+                status=ACCESS_DENIED_STATUS,
+                note="Aucun visage detecte devant la camera.",
+            )
             return JSONResponse(status_code=400, content={"message": "Aucun visage détecté devant la caméra."})
         
         # Compare against all registered faces
@@ -245,6 +377,13 @@ async def verify_face(payload: VerifyPayload):
         
         if best_sim > 0.5:
             barrier_opened = send_arduino_command("OPEN")
+            log_access_attempt(
+                person_name=best_name,
+                status=ACCESS_GRANTED_STATUS,
+                similarity=best_sim,
+                barrier_opened=barrier_opened,
+                note="Acces accorde apres reconnaissance faciale.",
+            )
             return {
                 "status": "success",
                 "similarity": best_sim,
@@ -253,9 +392,16 @@ async def verify_face(payload: VerifyPayload):
                 "message": f"ACCÈS ACCORDÉ — Bienvenue {best_name}"
             }
         else:
+            log_access_attempt(
+                person_name=best_name or "Inconnu",
+                status=ACCESS_DENIED_STATUS,
+                similarity=best_sim,
+                note="Visage non reconnu ou seuil de similarite insuffisant.",
+            )
             return {
                 "status": "fail",
                 "similarity": best_sim,
+                "name": best_name,
                 "barrier_opened": False,
                 "message": "ACCÈS REFUSÉ — Personne non reconnue"
             }

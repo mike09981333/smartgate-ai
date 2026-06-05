@@ -79,6 +79,13 @@ Avec le venv active :
 pip install -r requirements.txt
 ```
 
+Le projet charge automatiquement les variables depuis le fichier `.env`.
+Si besoin, dupliquer d'abord l'exemple :
+
+```bash
+cp .env.exemple .env
+```
+
 Si `cv2` manque encore :
 
 ```bash
@@ -161,6 +168,32 @@ http://127.0.0.1:8000
 5. Capturer le visage.
 6. Si le visage correspond, l'API renvoie `success` et envoie `OPEN` a l'Arduino.
 7. La barriere s'ouvre automatiquement.
+
+## 8.b Base de donnees SQLite
+
+Une base SQLite est creee automatiquement dans :
+
+```text
+web_app/data/smartgate.db
+```
+
+La table `access_logs` enregistre chaque tentative avec :
+
+- le nom de la personne
+- le statut `accorde` ou `refuse`
+- le score de similarite
+- la date
+- l'heure
+- le jour
+- l'horodatage complet
+- l'etat d'ouverture de la barriere
+- une note descriptive
+
+Tu peux aussi consulter l'historique via l'API :
+
+```text
+GET /access-logs
+```
 
 ## 9. Probleme de permission Arduino
 

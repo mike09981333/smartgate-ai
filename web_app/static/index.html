@@ -6,8 +6,7 @@
     <title>Contrôle d'Accès Biométrique</title>
     <meta name="description" content="Système de contrôle d'accès par reconnaissance faciale biométrique alimenté par l'IA.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css?v=delete-users-2">
-    <!-- Lucide Icons -->
+    <link rel="stylesheet" href="/static/style.css?v=pages-html-1">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
@@ -19,163 +18,160 @@
     </div>
 
     <div class="app-wrapper">
-        <!-- Left: Main Camera Panel -->
-        <div class="glass-container main-panel">
-            <header>
-                <div class="logo-row">
-                    <div class="logo-icon">
-                        <i data-lucide="shield-check"></i>
-                    </div>
-                    <div>
-                        <h1>Sécurité Biométrique</h1>
-                        <p class="subtitle">Contrôle d'Accès par Reconnaissance Faciale</p>
-                    </div>
+        <aside class="glass-container sidebar">
+            <div class="sidebar-brand">
+                <div class="logo-icon">
+                    <i data-lucide="shield-check"></i>
                 </div>
-            </header>
-
-            <div class="tabs">
-                <button class="tab-btn active" id="tab-register" onclick="switchTab('register')">
-                    <i data-lucide="user-plus"></i>
-                    <span>S'enregistrer</span>
-                </button>
-                <button class="tab-btn" id="tab-verify" onclick="switchTab('verify')">
-                    <i data-lucide="scan-face"></i>
-                    <span>Contrôle d'Accès</span>
-                </button>
+                <div>
+                    <h2>SmartGate AI</h2>
+                    <p>Navigation rapide</p>
+                </div>
             </div>
 
-            <div class="camera-section">
-                <div class="camera-frame">
-                    <div class="corner corner-tl"></div>
-                    <div class="corner corner-tr"></div>
-                    <div class="corner corner-bl"></div>
-                    <div class="corner corner-br"></div>
-                </div>
-                <video id="videoElement" autoplay playsinline></video>
-                <canvas id="canvasElement" style="display:none;"></canvas>
-                <div class="camera-status" id="camera-status">
-                    <i data-lucide="video"></i>
-                    <span>Caméra Active</span>
-                </div>
-                <!-- Frozen frame (shown during scan) -->
-                <canvas id="frozenFrame" class="frozen-frame" style="display:none;"></canvas>
+            <nav class="sidebar-nav">
+                <a class="sidebar-link active" href="/">
+                    <i data-lucide="home"></i>
+                    <span>Accueil</span>
+                </a>
+                <a class="sidebar-link" href="/static/users.html">
+                    <i data-lucide="users"></i>
+                    <span>Personnes autorisées</span>
+                </a>
+                <a class="sidebar-link" href="/static/history.html">
+                    <i data-lucide="history"></i>
+                    <span>Historique</span>
+                </a>
+            </nav>
 
-                <!-- 3D Scan overlay -->
-                <div id="scanOverlay" class="scan-overlay" style="display: none;">
-                    <!-- Dark tinted backdrop -->
-                    <div class="scan-backdrop"></div>
+            <div class="sidebar-note">
+                <p class="sidebar-note-title">Centre de contrôle</p>
+                <p class="sidebar-note-text">Gérez l'enregistrement facial et le contrôle d'accès depuis l'accueil.</p>
+            </div>
+        </aside>
 
-                    <!-- 3D rotating ring -->
-                    <div class="scan-3d-scene">
-                        <div class="scan-ring ring-outer"></div>
-                        <div class="scan-ring ring-inner"></div>
-                        <div class="scan-ring ring-mid"></div>
-                    </div>
-
-                    <!-- Horizontal grid lines with perspective -->
-                    <div class="scan-grid">
-                        <div class="grid-line gl-1"></div>
-                        <div class="grid-line gl-2"></div>
-                        <div class="grid-line gl-3"></div>
-                        <div class="grid-line gl-4"></div>
-                        <div class="grid-line gl-5"></div>
-                    </div>
-
-                    <!-- Facial landmark dots -->
-                    <div class="scan-landmarks">
-                        <span class="lm" style="top:30%;left:35%"></span>
-                        <span class="lm" style="top:30%;left:65%"></span>
-                        <span class="lm" style="top:48%;left:50%"></span>
-                        <span class="lm" style="top:62%;left:42%"></span>
-                        <span class="lm" style="top:62%;left:58%"></span>
-                        <span class="lm" style="top:72%;left:50%"></span>
-                        <span class="lm" style="top:38%;left:30%"></span>
-                        <span class="lm" style="top:38%;left:70%"></span>
-                        <span class="lm" style="top:55%;left:35%"></span>
-                        <span class="lm" style="top:55%;left:65%"></span>
-                    </div>
-
-                    <!-- Sweep line -->
-                    <div class="scan-sweep"></div>
-
-                    <!-- Scan corners -->
-                    <div class="scan-corners-3d">
-                        <div class="sc3d sc3d-tl"></div>
-                        <div class="sc3d sc3d-tr"></div>
-                        <div class="sc3d sc3d-bl"></div>
-                        <div class="sc3d sc3d-br"></div>
-                    </div>
-
-                    <!-- Status pill -->
-                    <div class="scan-status-3d">
-                        <div class="scan-status-dot"></div>
-                        <span>Analyse biométrique en cours</span>
-                        <div class="scan-progress">
-                            <div class="scan-progress-bar"></div>
+        <div class="content-area">
+            <div class="glass-container main-panel">
+                <header>
+                    <div class="logo-row">
+                        <div class="logo-icon">
+                            <i data-lucide="shield-check"></i>
+                        </div>
+                        <div>
+                            <h1>Sécurité Biométrique</h1>
+                            <p class="subtitle">Contrôle d'Accès par Reconnaissance Faciale</p>
                         </div>
                     </div>
+                </header>
+
+                <div class="tabs">
+                    <button class="tab-btn active" id="tab-register" type="button" onclick="switchTab('register')">
+                        <i data-lucide="user-plus"></i>
+                        <span>S'enregistrer</span>
+                    </button>
+                    <button class="tab-btn" id="tab-verify" type="button" onclick="switchTab('verify')">
+                        <i data-lucide="scan-face"></i>
+                        <span>Contrôle d'Accès</span>
+                    </button>
                 </div>
 
-                <!-- Simple loading for register -->
-                <div id="loading" class="loading-overlay" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Analyse IA en cours...</p>
-                </div>
-            </div>
-
-            <div class="action-section" id="register-section">
-                <p class="instruction">
-                    <i data-lucide="info" class="instruction-icon"></i>
-                    Placez votre visage au centre et entrez votre nom pour vous enregistrer.
-                </p>
-                <div class="input-group">
-                    <i data-lucide="user" class="input-icon"></i>
-                    <input type="text" id="username" class="glass-input" placeholder="Entrez votre nom..." autocomplete="off" />
-                </div>
-                <button class="primary-btn" id="register-btn" onclick="captureAndSend('register')">
-                    <i data-lucide="camera"></i>
-                    <span>Enregistrer Mon Visage</span>
-                </button>
-            </div>
-
-            <div class="action-section" id="verify-section" style="display: none;">
-                <p class="instruction">
-                    <i data-lucide="info" class="instruction-icon"></i>
-                    Présentez-vous devant la caméra pour vérifier votre accès.
-                </p>
-                <button class="primary-btn verify-btn" id="verify-btn" onclick="captureAndSend('verify')">
-                    <i data-lucide="scan-face"></i>
-                    <span>Vérifier Mon Identité</span>
-                </button>
-            </div>
-
-            <div id="notification" class="notification">
-                <i data-lucide="check-circle" class="notif-icon"></i>
-                <span class="notif-text"></span>
-            </div>
-        </div>
-
-        <!-- Right: Authorized Users Panel -->
-        <div class="glass-container users-panel">
-            <div class="users-panel-header">
-                <div class="panel-title-row">
-                    <i data-lucide="users" class="panel-icon"></i>
-                    <h2>Personnes Autorisées</h2>
-                </div>
-                <span class="user-count" id="user-count">0</span>
-            </div>
-            <div class="users-grid" id="users-grid">
-                <div class="empty-state" id="empty-state">
-                    <div class="empty-icon-wrapper">
-                        <i data-lucide="lock" class="empty-icon"></i>
+                <div class="camera-section">
+                    <div class="camera-frame">
+                        <div class="corner corner-tl"></div>
+                        <div class="corner corner-tr"></div>
+                        <div class="corner corner-bl"></div>
+                        <div class="corner corner-br"></div>
                     </div>
-                    <p class="empty-title">Aucune personne enregistrée</p>
-                    <p class="empty-hint">Utilisez l'onglet "S'enregistrer" pour ajouter des personnes.</p>
+                    <video id="videoElement" autoplay playsinline></video>
+                    <canvas id="canvasElement" style="display:none;"></canvas>
+                    <div class="camera-status" id="camera-status">
+                        <i data-lucide="video"></i>
+                        <span>Caméra Active</span>
+                    </div>
+                    <canvas id="frozenFrame" class="frozen-frame" style="display:none;"></canvas>
+
+                    <div id="scanOverlay" class="scan-overlay" style="display: none;">
+                        <div class="scan-backdrop"></div>
+                        <div class="scan-3d-scene">
+                            <div class="scan-ring ring-outer"></div>
+                            <div class="scan-ring ring-inner"></div>
+                            <div class="scan-ring ring-mid"></div>
+                        </div>
+                        <div class="scan-grid">
+                            <div class="grid-line gl-1"></div>
+                            <div class="grid-line gl-2"></div>
+                            <div class="grid-line gl-3"></div>
+                            <div class="grid-line gl-4"></div>
+                            <div class="grid-line gl-5"></div>
+                        </div>
+                        <div class="scan-landmarks">
+                            <span class="lm" style="top:30%;left:35%"></span>
+                            <span class="lm" style="top:30%;left:65%"></span>
+                            <span class="lm" style="top:48%;left:50%"></span>
+                            <span class="lm" style="top:62%;left:42%"></span>
+                            <span class="lm" style="top:62%;left:58%"></span>
+                            <span class="lm" style="top:72%;left:50%"></span>
+                            <span class="lm" style="top:38%;left:30%"></span>
+                            <span class="lm" style="top:38%;left:70%"></span>
+                            <span class="lm" style="top:55%;left:35%"></span>
+                            <span class="lm" style="top:55%;left:65%"></span>
+                        </div>
+                        <div class="scan-sweep"></div>
+                        <div class="scan-corners-3d">
+                            <div class="sc3d sc3d-tl"></div>
+                            <div class="sc3d sc3d-tr"></div>
+                            <div class="sc3d sc3d-bl"></div>
+                            <div class="sc3d sc3d-br"></div>
+                        </div>
+                        <div class="scan-status-3d">
+                            <div class="scan-status-dot"></div>
+                            <span>Analyse biométrique en cours</span>
+                            <div class="scan-progress">
+                                <div class="scan-progress-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="loading" class="loading-overlay" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Analyse IA en cours...</p>
+                    </div>
+                </div>
+
+                <div class="action-section" id="register-section">
+                    <p class="instruction">
+                        <i data-lucide="info" class="instruction-icon"></i>
+                        Placez votre visage au centre et entrez votre nom pour vous enregistrer.
+                    </p>
+                    <div class="input-group">
+                        <i data-lucide="user" class="input-icon"></i>
+                        <input type="text" id="username" class="glass-input" placeholder="Entrez votre nom..." autocomplete="off" />
+                    </div>
+                    <button class="primary-btn" id="register-btn" type="button" onclick="captureAndSend('register')">
+                        <i data-lucide="camera"></i>
+                        <span>Enregistrer Mon Visage</span>
+                    </button>
+                </div>
+
+                <div class="action-section" id="verify-section" style="display: none;">
+                    <p class="instruction">
+                        <i data-lucide="info" class="instruction-icon"></i>
+                        Présentez-vous devant la caméra pour vérifier votre accès.
+                    </p>
+                    <button class="primary-btn verify-btn" id="verify-btn" type="button" onclick="captureAndSend('verify')">
+                        <i data-lucide="scan-face"></i>
+                        <span>Vérifier Mon Identité</span>
+                    </button>
+                </div>
+
+                <div id="notification" class="notification">
+                    <i data-lucide="check-circle" class="notif-icon"></i>
+                    <span class="notif-text"></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="/static/script.js?v=delete-users-2"></script>
+    <script src="/static/script.js?v=pages-html-1"></script>
 </body>
 </html>

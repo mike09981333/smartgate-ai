@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personnes Autorisées</title>
+    <meta name="description" content="Liste des personnes autorisées enregistrées dans SmartGate AI.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=pages-html-1">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <div class="app-wrapper">
+        <aside class="glass-container sidebar">
+            <div class="sidebar-brand">
+                <div class="logo-icon">
+                    <i data-lucide="shield-check"></i>
+                </div>
+                <div>
+                    <h2>SmartGate AI</h2>
+                    <p>Navigation rapide</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a class="sidebar-link" href="/">
+                    <i data-lucide="home"></i>
+                    <span>Accueil</span>
+                </a>
+                <a class="sidebar-link active" href="/static/users.html">
+                    <i data-lucide="users"></i>
+                    <span>Personnes autorisées</span>
+                </a>
+                <a class="sidebar-link" href="/static/history.html">
+                    <i data-lucide="history"></i>
+                    <span>Historique</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-note">
+                <p class="sidebar-note-title">Base locale</p>
+                <p class="sidebar-note-text">Visualisez et supprimez les profils faciaux enregistrés.</p>
+            </div>
+        </aside>
+
+        <div class="content-area">
+            <div class="glass-container page-panel users-page-panel">
+                <div class="page-header">
+                    <div class="panel-title-row">
+                        <i data-lucide="users" class="panel-icon"></i>
+                        <h2>Personnes Autorisées</h2>
+                    </div>
+                    <span class="user-count" id="user-count">0</span>
+                </div>
+
+                <div class="users-grid full-grid" id="users-grid">
+                    <div class="empty-state" id="empty-state">
+                        <div class="empty-icon-wrapper">
+                            <i data-lucide="lock" class="empty-icon"></i>
+                        </div>
+                        <p class="empty-title">Aucune personne enregistrée</p>
+                        <p class="empty-hint">Utilisez la page Accueil pour ajouter des personnes.</p>
+                    </div>
+                </div>
+
+                <div id="notification" class="notification">
+                    <i data-lucide="check-circle" class="notif-icon"></i>
+                    <span class="notif-text"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js?v=pages-html-1"></script>
+</body>
+</html>
