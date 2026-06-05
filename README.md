@@ -63,7 +63,7 @@ Pour un guide complet (configuration matérielle, installation des dépendances,
 
 ### 1. Cloner le dépôt
 ```bash
-git clone https://github.com/votre-nom/smartgate-ai.git
+git clone https://github.com/Credok12/smartgate-ai.git
 cd smartgate-ai
 ```
 
